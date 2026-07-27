@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>无限流凶宅｜你的本命耽美角色测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft Yahei", sans-serif;
+    }
+    body {
+      background: #14141c;
+      color: #e6e6e6;
+      min-height: 100vh;
+      padding: 20px 15px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;transform: translateY(10px);}
+      to {opacity: 1;transform: translateY(0);}
+    }
+    .card {
+      background: #1e1e2b;
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid #35354f;
+      box-shadow: 0 0 15px #291f3b66;
+    }
+    h1 {
+      color: #d8b9f0;
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+    h2 {
+      color: #c9b0e3;
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+    .desc {
+      color: #b8b8cc;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .option-item {
+      background: #27273a;
+      border: 1px solid #3c3c5c;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .option-item:hover {
+      background: #31314e;
+      border-color: #a77cd8;
+      box-shadow: 0 0 8px #9263cc60;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: #8858c2;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #9c6ed8;
+    }
+    .result-block {
+      margin-top: 20px;
+    }
+    .result-line {
+      margin: 10px 0;
+      padding: 8px 0;
+    }
+    .label-title {
+      color: #d8b9f0;
+      font-weight: bold;
+    }
+    .quote {
+      background: #27273a;
+      padding: 12px 16px;
+      border-left: 3px solid #a77cd8;
+      border-radius: 0 8px 8px 0;
+      margin: 12px 0;
+      font-style: italic;
+      color: #d0c0e6;
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .button-group .btn {
+      flex: 1;
+    }
+    .progress-text {
+      text-align: center;
+      color: #9999b3;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- 首页 -->
+  <div id="page-home" class="page active">
+    <div class="card">
+      <h1>无限流凶宅副本 · 角色匹配测试</h1>
+      <p class="desc">你被拉入诡异凶宅闯关，10道副本选择，测出你的适配国产耽美角色<br>包含书名、人设、专属语录</p>
+      <button class="btn btn-primary" onclick="startTest()">进入凶宅，开始测试</button>
+    </div>
+  </div>
+
+  <!-- 答题页 -->
+  <div id="page-test" class="page">
+    <div class="card">
+      <p class="progress-text" id="progressNum">第1题 / 共10题</p>
+      <h2 id="questionText">题目加载中</h2>
+      <div id="optionBox"></div>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div id="page-result" class="page">
+    <div class="card">
+      <h1>你的匹配角色</h1>
+      <div class="result-block">
+        <div class="result-line"><span class="label-title">角色：</span><span id="resName"></span></div>
+        <div class="result-line"><span class="label-title">原著：</span><span id="resBook"></span></div>
+        <div class="result-line"><span class="label-title">性格标签：</span><span id="resTag"></span></div>
+        <div class="result-line"><span class="label-title">人设简介：</span><span id="resIntro"></span></div>
+        <div class="result-line">
+          <div class="label-title">经典语录：</div>
+          <div class="quote" id="resQuote"></div>
+        </div>
+        <div class="result-line"><span class="label-title">匹配依据：</span><span id="resReason"></span></div>
+      </div>
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="restartTest()">重新测试</button>
+        <button class="btn btn-primary" onclick="copyResult()">复制全部结果</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 全部10道无限流凶宅题目
+const questionList = [
+  {
+    q: "你被拉入无限流，睁眼身处一栋昏暗独栋凶宅。玄关并列四扇独立房门，规则提示只能选一扇进入，你选择？",
+    opts: [
+      {text:"A 门板爬满暗红干枯藤蔓，门缝飘出浓重血腥味",tags:["疯批偏执","护短","强势占有"]},
+      {text:"B 整扇门覆着薄冰，无任何声响，冷得刺骨",tags:["清冷","疏离淡漠","内敛隐忍"]},
+      {text:"C 木门贴着褪色暖黄窗花，屋内隐约有温和人声",tags:["温柔","通透佛系","心软包容"]},
+      {text:"D 门板磕碰划痕密布，锁具老旧松动，方便破门跑路",tags:["痞野","坦荡利落","随性张扬"]}
+    ]
+  },
+  {
+    q: "进入房间后触发被动天赋，副本规则要求终身绑定一种能力，必须选定其一。",
+    opts: [
+      {text:"A 可以瞬间看穿副本所有NPC、鬼怪的真实心思与算计",tags:["腹黑","心思缜密","冷静"]},
+      {text:"B 所有情绪都会被强行屏蔽，再惊悚场面也不露神态",tags:["隐忍","清冷","克制"]},
+      {text:"C 自带亲和力，鬼怪路人极易放下戒备，不会主动攻击",tags:["温柔","敏感细腻","共情力强"]},
+      {text:"D 不受副本规则束缚，行动自由，不用遵守鬼怪规矩",tags:["通透佛系","洒脱","随性"]}
+    ]
+  },
+  {
+    q: "凶宅绑定的重要队友刻意躲着你，全程冷淡回避，无任何线索。你的做法？",
+    opts: [
+      {text:"A 不动声色顺着宅内痕迹暗中调查试探，摸清缘由",tags:["腹黑","敏感","嘴硬心软"]},
+      {text:"B 不追问不寻找，主动避开对方房间，守住自己范围",tags:["疏离淡漠","隐忍","清冷"]},
+      {text:"C 主动当面坦诚发问，把隔阂说开，拒绝猜忌闯关",tags:["阳光开朗","坦荡利落","直率"]},
+      {text:"D 嘴上吐槽不在意，独处时反复回想暗自低落",tags:["傲娇","外硬内软"]}
+    ]
+  },
+  {
+    q: "副本倒计时仅剩半小时，只能带一件物品通关，你在储物间选择？",
+    opts: [
+      {text:"A 锋利古董短刃，对抗鬼怪，掌握战斗主动权",tags:["强势占有","偏执","掌控欲"]},
+      {text:"B 老旧硬壳笔记本，记录宅内线索、鬼怪作息",tags:["清冷","缜密","内敛"]},
+      {text:"C 私人旧吊坠，承载回忆的纪念小物件",tags:["温柔","重情","敏感细腻"]},
+      {text:"D 磨损轻便手环，方便跑动躲避追击",tags:["痞野","通透","适应力强"]}
+    ]
+  },
+  {
+    q: "二楼走廊和恶鬼对峙，道理占优却被规则压制落入下风。",
+    opts: [
+      {text:"A 假意退让，记录漏洞，后续布局反制夺回主动权",tags:["腹黑","隐忍","谋定后动"]},
+      {text:"B 懒得争辩，退回安全房间，不再纠结拉扯",tags:["清冷","通透佛系","厌纷争"]},
+      {text:"C 当场梳理逻辑对峙到底，说完对错专心闯关",tags:["阳光开朗","坦荡利落","直爽"]},
+      {text:"D 嘴上硬刚不肯认输，离开后独自焦虑emo",tags:["傲娇","嘴硬心软"]}
+    ]
+  },
+  {
+    q: "躲进安全屋休整，放空时脑海最常浮现？",
+    opts: [
+      {text:"A 无人荒原、雪山孤楼，四下寂静空无一人",tags:["疏离淡漠","清冷","寡欲"]},
+      {text:"B 烟火市井小屋，暖灯人声安稳日常",tags:["温柔","向往安稳","敏感细腻"]},
+      {text:"C 副本博弈圈套、人心拉扯算计画面",tags:["腹黑","爱琢磨","心思重"]},
+      {text:"D 自由穿梭街巷山野，不受副本地点束缚",tags:["痞野","洒脱","热爱自由"]}
+    ]
+  },
+  {
+    q: "组队队友触碰凶宅禁忌遇险，你的第一行事模式？",
+    opts: [
+      {text:"A 悄悄搜集解法救人，解决后不主动邀功",tags:["隐忍","温柔","护短"]},
+      {text:"B 拆解规则弱点，规划完整清晰救援路线",tags:["清冷","理智","靠谱"]},
+      {text:"C 先安抚情绪，等对方平复再商量对策",tags:["阳光开朗","包容","共情强"]},
+      {text:"D 嘴上吐槽莽撞，行动力拉满立刻施救",tags:["傲娇","嘴硬心软","热心"]}
+    ]
+  },
+  {
+    q: "通关可留下永久副本印记，选专属人生烙印短句",
+    opts: [
+      {text:"A 万般算计皆可让步，唯独执念之人绝不能放手",tags:["疯批偏执","占有欲","专一"]},
+      {text:"B 副本喧嚣与我无关，闯关只求随心自在",tags:["通透佛系","清冷","松弛"]},
+      {text:"C 心有软肋亦有铠甲，温柔待人自有底线",tags:["温柔","坚韧","隐忍"]},
+      {text:"D 好恶直白外露，热烈随性，不受人情规则捆绑",tags:["痞野","直率","热烈张扬"]}
+    ]
+  },
+  {
+    q: "解锁预知能力，整趟凶宅副本仅能预知一件事",
+    opts: [
+      {text:"A 在意之人全程安危，确认对方是否遇险",tags:["偏执","深情","敏感细腻"]},
+      {text:"B 全宅陷阱鬼怪时间，提前规避致命危险",tags:["腹黑","谨慎","隐忍筹谋"]},
+      {text:"C 最简单安稳通关路线，只求平稳结束副本",tags:["通透佛系","温柔","不喜波折"]},
+      {text:"D 所有自由脱逃点位，方便随时抛开规则跑路",tags:["阳光开朗","洒脱","热爱冒险"]}
+    ]
+  },
+  {
+    q: "其他闯关玩家在压抑凶宅里，对你的第一印象普遍是？",
+    opts: [
+      {text:"A 神色冷淡难接近，气场冷，自带距离感",tags:["清冷","疏离淡漠","强势"]},
+      {text:"B 外放张扬胆子大，内里细腻敏感",tags:["痞野","傲娇","反差感"]},
+      {text:"C 温和好沟通，相处越久主见越强",tags:["温柔","通透佛系","外柔内刚"]},
+      {text:"D 外表散漫随意，实则心思缜密留心细节",tags:["腹黑","松弛感","藏心事"]}
+    ]
+  }
+];
+
+// 40位完整角色库
+const roleList = [
+  // 古风14
+  {name:"花城",book:"天官赐福",tags:["疯批偏执","深情","桀骜","护短"],intro:"绝境鬼王，执念深重，桀骜张扬，一生只为守护谢怜",quote:"为你战死是我至高无上的荣耀。"},
+  {name:"谢怜",book:"天官赐福",tags:["温柔","隐忍","通透佛系","坚韧"],intro:"历经起落苦难，依旧心怀善意包容，心性坚韧豁达",quote:"身在无间，心在桃源。"},
+  {name:"沈兰舟",book:"将进酒",tags:["腹黑","隐忍","强势","清冷"],intro:"城府深沉步步筹谋，外冷内韧，野心与柔软共存",quote:"我辈中人，无拘无束，不礼不法。"},
+  {name:"萧驰野",book:"将进酒",tags:["痞野","强势","热血","占有欲"],intro:"野性桀骜，行动力极强，偏爱直白热烈地护住心上人",quote:"我要野，也要你。"},
+  {name:"楚晚宁",book:"二哈和他的白猫师尊",tags:["清冷","隐忍","温柔","嘴硬心软"],intro:"恪守本心不善表达，默默隐忍负重，内心柔软至极",quote:"人间多有遗憾，唯有执念不肯放过。"},
+  {name:"墨燃",book:"二哈和他的白猫师尊",tags:["偏执热烈","冲动","桀骜重情"],intro:"爱恨浓烈直白，莽撞赤诚，对楚晚宁执念深入骨髓",quote:"地狱太冷，楚晚宁，你来殉我。"},
+  {name:"顾昀",book:"杀破狼",tags:["痞野通透","洒脱","温柔","外柔内刚"],intro:"表面散漫不羁心怀家国，看似随性实则细腻温柔",quote:"经年痴心妄想，一时走火入魔。"},
+  {name:"长庚",book:"杀破狼",tags:["隐忍","腹黑","温柔专一","顾家"],intro:"隐忍成长思虑周全，满心牵挂顾昀，专一靠谱",quote:"我愿为你，长命百岁，岁岁平安。"},
+  {name:"严争鸣",book:"六爻",tags:["傲娇","嘴硬心软","护短","张扬"],intro:"少爷脾气嘴上刻薄，亲友遇险一定会拼命守护",quote:"我偏要勉强。"},
+  {name:"程潜",book:"六爻",tags:["清冷","内敛","坚韧","寡言"],intro:"沉静话少，习惯吃苦隐忍，内心目标坚定",quote:"岁月漫长，终能重逢。"},
+  {name:"沈峤",book:"山河剑心",tags:["温柔","佛系通透","包容柔软"],intro:"心性豁达看淡纷争，待人包容温和，不争不抢",quote:"心有山海，静而不争。"},
+  {name:"晏无师",book:"山河剑心",tags:["疯批随性","强势","傲娇肆意"],intro:"随心所欲霸道强势，傲娇随性，唯独偏爱护着沈峤",quote:"我偏护着沈峤，谁也管不着。"},
+  {name:"闻时",book:"判官",tags:["疏离淡漠","敏感","隐忍","心软"],intro:"自带距离感习惯独处承压，外表冷淡内心柔软敏感",quote:"万般因果，皆有归途。"},
+  {name:"谢必安",book:"判官",tags:["清冷通透","温柔","稳重","宿命感"],intro:"冷静通透看透轮回，温柔稳重，执着奔赴宿命之人",quote:"轮回往复，我一定会找到你。"},
+
+  //现代12
+  {name:"蒋丞",book:"撒野",tags:["阳光开朗","直率","坚韧","坦荡利落"],intro:"热烈明朗不服命运，做事爽快坦荡，永远向阳而生",quote:"我一脚踏空，我就要飞起来了。"},
+  {name:"顾飞",book:"撒野",tags:["痞野","外冷内热","隐忍","靠谱"],intro:"外表随性冷淡，独自扛下生活重压，踏实可靠重情义",quote:"希望我们都能像对方一样勇敢。"},
+  {name:"江添",book:"某某",tags:["清冷疏离","内敛","专一","寡言"],intro:"安静寡言情绪内敛，长久深情专一，习惯把心事藏起",quote:"无人知晓他们在一起，但人人都曾见过他们在一起的样子。"},
+  {name:"盛望",book:"某某",tags:["阳光开朗","跳脱","傲娇","敏感细腻"],intro:"活泼外向，嘴硬傲娇，情绪细腻很容易胡思乱想",quote:"我的骨骼说，我还是爱你。"},
+  {name:"贺朝",book:"伪装学渣",tags:["腹黑","开朗","随性","嘴甜张扬"],intro:"狡黠爱玩乐观松弛，很会撩人，偏爱偏爱谢俞",quote:"谢俞小朋友，是我的终生理想。"},
+  {name:"谢俞",book:"伪装学渣",tags:["清冷","傲娇","内敛温柔","冷静"],intro:"外表暴躁冷淡，内心温柔细心，遇事冷静靠谱",quote:"贺朝，我没喜欢过人，面前这个，第一个。"},
+  {name:"魏无羡",book:"魔道祖师",tags:["阳光开朗","痞野","通透随性","桀骜"],intro:"潇洒跳脱不惧流言，活得热烈自由，通透豁达",quote:"是非在己，毁誉由人，得失不论。"},
+  {name:"蓝忘机",book:"魔道祖师",tags:["清冷","隐忍","温柔","执着专一"],intro:"恪守雅正寡言克制，隐忍深情，执着等候魏无羡",quote:"我想带一人回云深不知处，带回去，藏起来。"},
+  {name:"赵声阁",book:"奇洛李维斯回信",tags:["傲娇","腹黑","强势","嘴硬心软"],intro:"港圈少爷闷骚占有欲强，嘴上冷淡，满心都是陈挽",quote:"旁人不必知晓，我只要陈挽留在身边。"},
+  {name:"陈挽",book:"奇洛李维斯回信",tags:["温柔","敏感细腻","隐忍","八面玲珑"],intro:"处事周全温柔，习惯默默暗恋付出，只求对方平安",quote:"不用他知晓我的心意，岁岁平安就足够。"},
+  {name:"沈见青",book:"情蛊",tags:["疯批偏执","疏离淡漠","强势占有"],intro:"苗疆少年外表清冷，执念极强，绝不放走李遇泽",quote:"李遇泽，我不会下蛊，但我绝不会放你走。"},
+  {name:"李遇泽",book:"情蛊",tags:["温柔","清醒倔强","敏感","隐忍"],intro:"温润理智内心倔强，心甘情愿被牵绊，温柔包容",quote:"万般困住，终究心甘情愿走向沈见青。"},
+
+  //都市刑侦8
+  {name:"骆闻舟",book:"默读",tags:["阳光开朗","稳重","坦荡","包容暖心"],intro:"成熟开朗情绪稳定，包容靠谱，永远给人安全感",quote:"你可以永远相信我。"},
+  {name:"费渡",book:"默读",tags:["腹黑","敏感","破碎温柔","细腻"],intro:"心思深沉圆滑，内心柔软缺安全感，共情细腻",quote:"我心里有一簇迎着烈日而生的花。"},
+  {name:"严峫",book:"破云",tags:["痞野","爽朗","强势外放"],intro:"热血直白大大咧咧，护短强势，喜怒哀乐很外放",quote:"我想保护的人，谁都不能动。"},
+  {name:"江停",book:"破云",tags:["清冷","隐忍","腹黑","缜密冷静"],intro:"背负过往克制隐忍，心思缜密步步筹谋",quote:"凡是过往，皆为序章。"},
+  {name:"步重华",book:"吞海",tags:["清冷","强势","较真","嘴硬心软"],intro:"严谨较真外表严厉，内心柔软有极强责任感",quote:"我护得住。"},
+  {name:"吴雩",book:"吞海",tags:["疏离","隐忍","温柔","缺乏安全感"],intro:"常年漂泊防备很重，温柔怯懦，隐忍半生终有归宿",quote:"颠沛半生，终于有归处。"},
+  {name:"陆沨",book:"小蘑菇",tags:["清冷","强势","理智","专一克制"],intro:"极致理性冷淡克制，唯独对安折无限偏爱包容",quote:"安折，我永远偏向你。"},
+  {name:"安折",book:"小蘑菇",tags:["温柔","纯粹","敏感软萌","乖巧"],intro:"干净温顺共情力强，愿意为爱奔赴所有危险",quote:"我愿意为你奔赴所有危险。"},
+
+  //无限流6
+  {name:"游惑",book:"全球高考",tags:["清冷","淡漠","强势","松弛厌世"],intro:"冷淡强悍不受规则束缚，松弛疏离，实力顶尖",quote:"世界灿烂盛大，欢迎回家。"},
+  {name:"秦究",book:"全球高考",tags:["腹黑","随性","疯批张扬","撩拨"],intro:"狡黠张扬掌控感足，随性大胆，执着偏爱游惑",quote:"游惑，我不是来救你的，我是来爱你的。"},
+  {name:"白柳",book:"我在惊悚游戏里封神",tags:["腹黑算计","利己疯批","野心"],intro:"精于算计清醒利己，护着自己人，凡事掌控利益",quote:"所有利益，我要握在自己手里。"},
+  {name:"牧四诚",book:"我在惊悚游戏里封神",tags:["阳光开朗","冲动","讲义气","跳脱"],intro:"活泼莽撞热血直白，极其看重朋友情义",quote:"朋友的事，就是我的事。"},
+  {name:"林秋石",book:"死亡万花筒",tags:["温柔","通透","冷静包容"],intro:"处事温和从容共情力强，冷静温柔闯过无数副本",quote:"前路虽暗，总有光亮。"},
+  {name:"阮南烛",book:"死亡万花筒",tags:["腹黑","温柔","掌控欲","细腻体贴"],intro:"心思缜密擅长兜底照顾，温柔细腻习惯掌控全局",quote:"我会陪你走完所有门。"}
+];
+
+let currentQ = 0;
+let scoreMap = {};
+questionList.forEach(q=>{
+  q.opts.forEach(opt=>{
+    opt.tags.forEach(t=>scoreMap[t]=0)
+  })
+})
+
+//页面切换
+function switchPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"))
+  document.getElementById(id).classList.add("active")
+}
+
+//开始测试
+function startTest(){
+  currentQ=0;
+  //清空分数
+  Object.keys(scoreMap).forEach(k=>scoreMap[k]=0)
+  renderQuestion()
+  switchPage("page-test")
+}
+
+//渲染题目
+function renderQuestion(){
+  const qItem = questionList[currentQ];
+  document.getElementById("progressNum").innerText = `第${currentQ+1}题 / 共10题`
+  document.getElementById("questionText").innerText = qItem.q;
+  const box = document.getElementById("optionBox");
+  box.innerHTML = "";
+  qItem.opts.forEach(opt=>{
+    const div = document.createElement("div");
+    div.className = "option-item";
+    div.innerText = opt.text;
+    div.onclick=()=>{
+      opt.tags.forEach(t=>scoreMap[t]++)
+      currentQ++;
+      if(currentQ>=questionList.length){
+        calcResult()
+      }else{
+        renderQuestion()
+      }
+    }
+    box.appendChild(div)
+  })
+}
+
+//计算匹配角色
+function calcResult(){
+  //给每个角色算总分
+  let maxScore = -1;
+  let matchRoles = [];
+  roleList.forEach(role=>{
+    let s=0;
+    role.tags.forEach(t=>s+=scoreMap[t]||0)
+    role.totalScore = s;
+    if(s>maxScore){
+      maxScore=s;
+      matchRoles=[role]
+    }else if(s===maxScore){
+      matchRoles.push(role)
+    }
+  })
+  //同分随机选一个
+  const finalRole = matchRoles[Math.floor(Math.random()*matchRoles.length)]
+  fillResult(finalRole)
+  switchPage("page-result")
+}
+
+//填充结果
+function fillResult(role){
+  document.getElementById("resName").innerText = role.name;
+  document.getElementById("resBook").innerText = role.book;
+  document.getElementById("resTag").innerText = role.tags.join("、");
+  document.getElementById("resIntro").innerText = role.intro;
+  document.getElementById("resQuote").innerText = role.quote;
+  document.getElementById("resReason").innerText = `你的选择标签和${role.name}性格重合度最高，副本处事风格高度适配。`;
+}
+
+//重测
+function restartTest(){
+  switchPage("page-home")
+}
+
+//复制文本
+function copyResult(){
+  const name = document.getElementById("resName").innerText;
+  const book = document.getElementById("resBook").innerText;
+  const tag = document.getElementById("resTag").innerText;
+  const intro = document.getElementById("resIntro").innerText;
+  const quote = document.getElementById("resQuote").innerText;
+  const text = `无限流凶宅测试结果
+角色：${name}
+原著：${book}
+性格标签：${tag}
+人设：${intro}
+经典语录：${quote}`;
+  navigator.clipboard.writeText(text).then(()=>alert("结果复制成功！"))
+}
+</script>
+</body>
+</html>
